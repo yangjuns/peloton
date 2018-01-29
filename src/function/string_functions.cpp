@@ -220,5 +220,78 @@ uint32_t StringFunctions::Length(
   return length;
 }
 
+char *StringFunctions::Upper(executor::ExecutorContext &ctx, const char *str,
+                             uint32_t length) {
+  PL_ASSERT(str != nullptr);
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(length));
+
+  // Convert str into upper case
+  // ASCII code: [a-z] : [97-122] and [A-Z] : [65-90]
+  for (uint32_t i = 0; i < length; i++) {
+    if ('a' <= str[i] && str[i] <= 'z') {
+      new_str[i] = str[i] - 32;
+    } else {
+      new_str[i] = str[i];
+    }
+  }
+  return new_str;
+}
+
+// type::Value StringFunctions::_Upper(const std::vector<type::Value> &args){
+//  PL_ASSERT(args.size() == 3);
+//  if(args[0].IsNull() || args[1].IsNull() || args[2].IsNull()){
+//    return type::ValueFactory::GetNullValueByType(type::TypeId::VARCHAR);
+//  }
+//
+//  std::string str = args[1].ToString();
+//}
+
+char *StringFunctions::Lower(executor::ExecutorContext &ctx, const char *str,
+                             uint32_t length) {
+  PL_ASSERT(str != nullptr);
+
+  // Allocate new memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(length));
+
+  // Convert str into lower case
+  // ASCII code: [a-z] : [97-122] and [A-Z] : [65-90]
+  for (uint32_t i = 0; i < length; i++) {
+    if ('A' <= str[i] && str[i] <= 'Z') {
+      new_str[i] = str[i] + 32;
+    } else {
+      new_str[i] = str[i];
+    }
+  }
+  return new_str;
+}
+
+StringFunctions::StrWithLen StringFunctions::Concat(
+    executor::ExecutorContext &ctx, const char **concat_strs,
+    const uint32_t *str_lens, const uint32_t n) {
+  // Calculate total length
+  uint32_t total_len = 0;
+  for (uint32_t i = 0; i < n; i++) {
+    if (concat_strs[i] != NULL) total_len += str_lens[i] - 1;
+  }
+  total_len++;
+
+  // Allocate enough memory
+  auto *pool = ctx.GetPool();
+  auto *new_str = reinterpret_cast<char *>(pool->Allocate(total_len));
+
+  // Copy memory
+  char *ptr = new_str;
+  for (uint32_t i = 0; i < n; i++) {
+    PL_MEMCPY(ptr, concat_strs[i], str_lens[i] - 1);
+    ptr += (str_lens[i] - 1);
+  }
+
+  return StringFunctions::StrWithLen{new_str, total_len};
+}
+
 }  // namespace function
 }  // namespace peloton
