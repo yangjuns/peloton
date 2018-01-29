@@ -84,8 +84,9 @@ class StringFunctions {
                      uint32_t length);
 
   // Concatanate n strings
-  StrWithLen Concat(executor::ExecutorContext &ctx, const char **concat_strs,
-                    const uint32_t *str_lens, const uint32_t n);
+  static StrWithLen Concat(executor::ExecutorContext &ctx,
+                           const char **concat_strs, const uint32_t *str_lens,
+                           const uint32_t n);
 };
 
 }  // namespace function

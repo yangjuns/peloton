@@ -240,15 +240,6 @@ char *StringFunctions::Upper(executor::ExecutorContext &ctx, const char *str,
   return new_str;
 }
 
-// type::Value StringFunctions::_Upper(const std::vector<type::Value> &args){
-//  PL_ASSERT(args.size() == 3);
-//  if(args[0].IsNull() || args[1].IsNull() || args[2].IsNull()){
-//    return type::ValueFactory::GetNullValueByType(type::TypeId::VARCHAR);
-//  }
-//
-//  std::string str = args[1].ToString();
-//}
-
 char *StringFunctions::Lower(executor::ExecutorContext &ctx, const char *str,
                              uint32_t length) {
   PL_ASSERT(str != nullptr);
@@ -277,6 +268,8 @@ StringFunctions::StrWithLen StringFunctions::Concat(
   for (uint32_t i = 0; i < n; i++) {
     if (concat_strs[i] != NULL) total_len += str_lens[i] - 1;
   }
+  if (total_len == 0) return StringFunctions::StrWithLen{NULL, 0};
+
   total_len++;
 
   // Allocate enough memory
@@ -286,8 +279,10 @@ StringFunctions::StrWithLen StringFunctions::Concat(
   // Copy memory
   char *ptr = new_str;
   for (uint32_t i = 0; i < n; i++) {
-    PL_MEMCPY(ptr, concat_strs[i], str_lens[i] - 1);
-    ptr += (str_lens[i] - 1);
+    if (concat_strs[i] != NULL) {
+      PL_MEMCPY(ptr, concat_strs[i], str_lens[i] - 1);
+      ptr += (str_lens[i] - 1);
+    }
   }
 
   return StringFunctions::StrWithLen{new_str, total_len};
