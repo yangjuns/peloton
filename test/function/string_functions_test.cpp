@@ -349,5 +349,34 @@ TEST_F(StringFunctionsTests, CodegenSubstrTest) {
   EXPECT_EQ(nullptr, res.str);
 }
 
+TEST_F(StringFunctionsTests, UpperTest){
+  const std::string str = "abc";
+  std::string expected = StringUtil::Upper(str);
+  std::vector<type::Value> arg1 = {type::ValueFactory::GetVarcharValue(str)};
+  auto result = function::OldEngineStringFunctions::Upper(arg1);
+  EXPECT_FALSE(result.IsNull());
+  EXPECT_EQ(expected, result.ToString());
+  // NULL CHECK
+  std::vector<type::Value> arg2 = {
+      type::ValueFactory::GetNullValueByType(type::TypeId::VARCHAR),
+  };
+  auto result2 = function::OldEngineStringFunctions::Upper(arg2);
+  EXPECT_TRUE(result2.IsNull());
+}
+
+TEST_F(StringFunctionsTests, LowerTest){
+  const std::string str = "abcDfTr";
+  std::string expected = StringUtil::Lower(str);
+  std::vector<type::Value> arg1 = {type::ValueFactory::GetVarcharValue(str)};
+  auto result = function::OldEngineStringFunctions::Lower(arg1);
+  EXPECT_FALSE(result.IsNull());
+  EXPECT_EQ(expected, result.ToString());
+  // NULL CHECK
+  std::vector<type::Value> arg2 = {
+      type::ValueFactory::GetNullValueByType(type::TypeId::VARCHAR),
+  };
+  auto result2 = function::OldEngineStringFunctions::Lower(arg2);
+  EXPECT_TRUE(result2.IsNull());
+}
 }  // namespace test
 }  // namespace peloton
